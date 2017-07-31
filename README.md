@@ -1,0 +1,1 @@
+# Magento Category Attribute Module
