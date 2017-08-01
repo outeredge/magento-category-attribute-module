@@ -75,15 +75,16 @@ class DataProvider extends CategoryDataProvider
     {
         $meta = parent::prepareMeta($meta);
         
-        // Convert boolean attributes to Yes/No select
         foreach ($this->getUserAttributes() as $attribute) {
             if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'])) {
                 if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean') {
+                    // Convert boolean attributes to Yes/No select
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
                 } 
                 else if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'media_image') {
+                    // Convert media_image attributes to image uploader
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'image';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'fileUploader';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['uploaderConfig'] = [
