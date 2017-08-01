@@ -40,22 +40,26 @@ class PrepareSave implements ObserverInterface
         }
         
         $category = $observer->getCategory();
-        $data = $observer->getRequest()->getParams();
+        $data = $observer->getRequest()->getPostValue();
         
         foreach ($this->getUserImageAttributes() as $image) {
-            if (isset($data[$image]) && is_array($data[$image])) {
-                if (!empty($data[$image]['delete'])) {
-                    $data[$image] = null;
-                } else {
-                    if (isset($data[$image][0]['name']) && isset($data[$image][0]['tmp_name'])) {
-                        $data[$image] = $data[$image][0]['name'];
+            if (empty($data[$image])) {
+                $category->setData($image, null);
+            } else {
+                if (isset($data[$image]) && is_array($data[$image])) {
+                    if (!empty($data[$image]['delete'])) {
+                        $data[$image] = null;
                     } else {
-                        unset($data[$image]);
+                        if (isset($data[$image][0]['name']) && isset($data[$image][0]['tmp_name'])) {
+                            $data[$image] = $data[$image][0]['name'];
+                        } else {
+                            unset($data[$image]);
+                        }
                     }
                 }
-            }
-            if (isset($data[$image])) {
-                $category->setData($image, $data[$image]);
+                if (isset($data[$image])) {
+                    $category->setData($image, $data[$image]);
+                }
             }
         }
         
