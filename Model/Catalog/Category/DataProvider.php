@@ -18,6 +18,11 @@ class DataProvider extends CategoryDataProvider
     private $attributeCollectionFactory;
     
     /**
+     * @var array
+     */
+    private $userAttributes;
+    
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -66,24 +71,42 @@ class DataProvider extends CategoryDataProvider
         );
     }
     
+    public function prepareMeta($meta)
+    {
+        $meta = parent::prepareMeta($meta);
+        
+        // Convert boolean attributes to Yes/No select
+        foreach ($this->getUserAttributes() as $attribute) {
+            if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType']) &&
+                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean')
+            {
+                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
+                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
+                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
+            }
+        }
+        
+        return $meta;
+    }
+    
     protected function getFieldsMap()
     {
         return array_merge_recursive(
             parent::getFieldsMap(),
-            $this->getUserDefinedFields()
+            ['attributes' => $this->getUserAttributes()]
         );
     }
     
-    protected function getUserDefinedFields()
+    protected function getUserAttributes()
     {
-        $attributeCollection = $this->attributeCollectionFactory->create()
-            ->addFieldToFilter('is_user_defined', ['eq' => true]);
-        
-        $attributes = [];
-        foreach ($attributeCollection as $attribute) {
-            $attributes[] = $attribute->getAttributeCode();
+        if (!$this->userAttributes) {
+            $attributeCollection = $this->attributeCollectionFactory->create()
+                ->addFieldToFilter('is_user_defined', ['eq' => true]);
+            
+            foreach ($attributeCollection as $attribute) {
+                $this->userAttributes[] = $attribute->getAttributeCode();
+            }
         }
-        
-        return ['attributes' => $attributes];
+        return $this->userAttributes;
     }
 }
