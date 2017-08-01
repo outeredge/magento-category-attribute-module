@@ -16,6 +16,7 @@ class NewAction extends Attribute
      * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
      * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
      *
     public function __construct(
@@ -23,10 +24,11 @@ class NewAction extends Attribute
         \Magento\Framework\Cache\FrontendInterface $attributeLabelCache,
         \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory,
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
     ) {
-        parent::__construct($context, $attributeLabelCache, $coreRegistry, $resultPageFactory);
         $this->resultForwardFactory = $resultForwardFactory;
+        parent::__construct($context, $attributeLabelCache, $coreRegistry, $resultPageFactory, $indexerFactory);
     }
     */
     
@@ -35,16 +37,18 @@ class NewAction extends Attribute
      * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
      * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory,
         \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
     ) {
-        parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->resultForwardFactory = $resultForwardFactory;
+        parent::__construct($context, $coreRegistry, $resultPageFactory, $indexerFactory);
     }
 
     /**

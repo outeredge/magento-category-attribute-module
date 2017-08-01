@@ -2,10 +2,11 @@
 
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category;
 
+use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result;
 use Magento\Framework\View\Result\PageFactory;
 
-abstract class Attribute extends \Magento\Backend\App\Action
+abstract class Attribute extends Action
 {
     /**
      * Authorization level of a basic admin session
@@ -35,6 +36,11 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $resultPageFactory;
+    
+    /**
+     * @var \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
+     */
+    protected $indexerFactory;
 
     /**
      * Constructor
@@ -43,16 +49,19 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
      *
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Cache\FrontendInterface $attributeLabelCache,
         \Magento\Framework\Registry $coreRegistry,
-        PageFactory $resultPageFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
     ) {
         $this->_coreRegistry = $coreRegistry;
         $this->_attributeLabelCache = $attributeLabelCache;
         $this->resultPageFactory = $resultPageFactory;
+        $this->indexerFactory = $indexerFactory;
         parent::__construct($context);
     }
     */
@@ -63,14 +72,17 @@ abstract class Attribute extends \Magento\Backend\App\Action
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
-        PageFactory $resultPageFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
     ) {
         $this->_coreRegistry = $coreRegistry;
         $this->resultPageFactory = $resultPageFactory;
+        $this->indexerFactory = $indexerFactory;
         parent::__construct($context);
     }
     
@@ -141,5 +153,18 @@ abstract class Attribute extends \Magento\Backend\App\Action
             $code = 'attr_' . ($code ?: substr(md5(time()), 0, 8));
         }
         return $code;
+    }
+    
+    /**
+     * Reindex the category flat data
+     * Needed when adding/deleting attributes
+     * 
+     * @return null
+     */
+    protected function reindexCategoryFlatData()
+    {
+        $this->indexerFactory->create()
+            ->load(\Magento\Catalog\Model\Indexer\Category\Flat\State::INDEXER_ID)
+            ->reindexAll();
     }
 }

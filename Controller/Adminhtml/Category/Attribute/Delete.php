@@ -25,6 +25,7 @@ class Delete extends Attribute
 
             try {
                 $model->delete();
+                $this->reindexCategoryFlatData();
                 $this->messageManager->addSuccess(__('You deleted the category attribute.'));
                 return $resultRedirect->setPath('categoryattribute/*/');
             } catch (\Exception $e) {

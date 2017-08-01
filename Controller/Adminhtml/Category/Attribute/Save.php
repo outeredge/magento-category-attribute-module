@@ -4,9 +4,9 @@
 
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
+use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Controller\ResultFactory;
-use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -48,6 +48,9 @@ class Save extends Attribute
      */
     private $layoutFactory;
     
+    /**
+     * @var \Magento\Framework\App\ResourceConnection
+     */
     private $resource;
     
     private $connection;
@@ -98,6 +101,7 @@ class Save extends Attribute
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
      * @param \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory
      * @param \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory
      * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory
@@ -111,6 +115,7 @@ class Save extends Attribute
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\Registry $coreRegistry,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
+        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory,
         \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory,
         \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory,
         \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory,
@@ -120,7 +125,6 @@ class Save extends Attribute
         \Magento\Framework\View\LayoutFactory $layoutFactory,
         \Magento\Framework\App\ResourceConnection $resource
     ) {
-        parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->buildFactory = $buildFactory;
         $this->filterManager = $filterManager;
         $this->productHelper = $productHelper;
@@ -128,8 +132,10 @@ class Save extends Attribute
         $this->validatorFactory = $validatorFactory;
         $this->groupCollectionFactory = $groupCollectionFactory;
         $this->layoutFactory = $layoutFactory;
+        $this->indexerFactory = $indexerFactory;
         $this->resource = $resource;
         $this->connection = $resource->getConnection(\Magento\Framework\App\ResourceConnection::DEFAULT_CONNECTION);
+        parent::__construct($context, $coreRegistry, $resultPageFactory, $indexerFactory);
     }
 
     /**
@@ -242,6 +248,7 @@ class Save extends Attribute
                     $groupId = 4;
                     $attributeId = $model->getAttributeId();
                     $this->addAttributeToGroup($this->_entityTypeId, $attributeSetId, $groupId, $attributeId, 100);
+                    $this->reindexCategoryFlatData();
                 }
                 
                 $this->messageManager->addSuccess(__('You saved the category attribute.'));
