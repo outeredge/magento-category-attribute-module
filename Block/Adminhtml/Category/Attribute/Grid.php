@@ -3,6 +3,7 @@
 namespace OuterEdge\CategoryAttribute\Block\Adminhtml\Category\Attribute;
 
 use Magento\Eav\Block\Adminhtml\Attribute\Grid\AbstractGrid;
+use Magento\Backend\Block\Widget\Grid\Extended as GridExtended;
 
 /**
  * @SuppressWarnings(PHPMD.DepthOfInheritance)
@@ -53,8 +54,30 @@ class Grid extends AbstractGrid
      */
     protected function _prepareColumns()
     {
-        parent::_prepareColumns();
+        GridExtended::_prepareColumns();
+        
+        $this->addColumn(
+            'attribute_code',
+            [
+                'header' => __('Attribute Code'),
+                'sortable' => true,
+                'index' => 'attribute_code',
+                'header_css_class' => 'col-attr-code',
+                'column_css_class' => 'col-attr-code'
+            ]
+        );
 
+        $this->addColumn(
+            'frontend_label',
+            [
+                'header' => __('Default Label'),
+                'sortable' => true,
+                'index' => 'frontend_label',
+                'header_css_class' => 'col-label',
+                'column_css_class' => 'col-label'
+            ]
+        );
+        
         $this->_eventManager->dispatch('category_attribute_grid_build', ['grid' => $this]);
 
         return $this;
