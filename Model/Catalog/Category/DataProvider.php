@@ -77,12 +77,19 @@ class DataProvider extends CategoryDataProvider
         
         // Convert boolean attributes to Yes/No select
         foreach ($this->getUserAttributes() as $attribute) {
-            if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType']) &&
-                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean')
-            {
-                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
-                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
-                $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
+            if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'])) {
+                if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean') {
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
+                } 
+                else if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'media_image') {
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'image';
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'fileUploader';
+                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['uploaderConfig'] = [
+                        'url' => 'categoryattribute/category_image/upload/attribute_code/' . $attribute
+                    ];
+                }
             }
         }
         
