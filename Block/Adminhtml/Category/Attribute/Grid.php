@@ -38,7 +38,9 @@ class Grid extends AbstractGrid
      */
     protected function _prepareCollection()
     {
-        $collection = $this->_collectionFactory->create();
+        $collection = $this->_collectionFactory->create()
+            ->addFieldToFilter('is_user_defined', ['eq' => true]);
+            
         $this->setCollection($collection);
 
         return parent::_prepareCollection();
