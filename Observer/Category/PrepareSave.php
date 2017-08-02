@@ -29,14 +29,14 @@ class PrepareSave implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if (empty($this->categoryAttributeHelper->getCustomImagesAttributesAsArray())) {
+        if (empty($this->categoryAttributeHelper->getCustomImageAttributesAsArray())) {
             return $this;
         }
         
         $category = $observer->getCategory();
         $data = $observer->getRequest()->getPostValue();
         
-        foreach ($this->categoryAttributeHelper->getCustomImagesAttributesAsArray() as $image) {
+        foreach ($this->categoryAttributeHelper->getCustomImageAttributesAsArray() as $image) {
             if (empty($data[$image])) {
                 $category->setData($image, null);
             } else {
