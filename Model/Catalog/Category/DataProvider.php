@@ -95,7 +95,7 @@ class DataProvider extends CategoryDataProvider
     {
         return array_merge_recursive(
             parent::getFieldsMap(),
-            ['attributes' => $this->getCustomAttributesAsArray()]
+            ['attributes' => $this->categoryAttributeHelper->getCustomAttributesAsArray()]
         );
     }
 }

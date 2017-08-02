@@ -45,7 +45,7 @@ class Data extends AbstractHelper
         parent::__construct($context);
     }
     
-    protected function getCustomAttributes()
+    public function getCustomAttributes()
     {
         if (!$this->customAttributes) {
             $this->customAttributes = $this->attributeCollectionFactory->create()
@@ -54,7 +54,7 @@ class Data extends AbstractHelper
         return $this->customAttributes;
     }
     
-    protected function getCustomImageAttributes()
+    public function getCustomImageAttributes()
     {
         if (!$this->customImageAttributes) {
             $this->customImageAttributes = $this->getCustomAttributes()
@@ -63,7 +63,7 @@ class Data extends AbstractHelper
         return $this->customImageAttributes;
     }
     
-    protected function getCustomAttributesAsArray()
+    public function getCustomAttributesAsArray()
     {
         if (!$this->customAttributesArray) {
             $this->customAttributesArray = [];
@@ -74,7 +74,7 @@ class Data extends AbstractHelper
         return $this->customAttributesArray;
     }
     
-    protected function getCustomImageAttributesAsArray()
+    public function getCustomImageAttributesAsArray()
     {
         if (!$this->customImageAttributesArray) {
             $this->customImageAttributesArray = [];
