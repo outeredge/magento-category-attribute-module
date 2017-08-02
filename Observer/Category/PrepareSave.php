@@ -4,27 +4,21 @@ namespace OuterEdge\CategoryAttribute\Observer\Category;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory;
 
 class PrepareSave implements ObserverInterface
 {
     /**
-     * @var AttributeCollectionFactory
+     * @var \OuterEdge\CategoryAttribute\Helper\Data
      */
-    private $attributeCollectionFactory;
+    protected $categoryAttributeHelper;
     
     /**
-     * @var array
-     */
-    private $userImageAttributes;
-    
-    /**
-     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      */
     public function __construct(
-        \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
     ) {
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
     
     /**
@@ -35,14 +29,14 @@ class PrepareSave implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        if (empty($this->getUserImageAttributes())) {
+        if (empty($this->categoryAttributeHelper->getCustomImagesAttributesAsArray())) {
             return $this;
         }
         
         $category = $observer->getCategory();
         $data = $observer->getRequest()->getPostValue();
         
-        foreach ($this->getUserImageAttributes() as $image) {
+        foreach ($this->categoryAttributeHelper->getCustomImagesAttributesAsArray() as $image) {
             if (empty($data[$image])) {
                 $category->setData($image, null);
             } else {
@@ -64,19 +58,5 @@ class PrepareSave implements ObserverInterface
         }
         
         return $this;
-    }
-    
-    protected function getUserImageAttributes()
-    {
-        if (!$this->userImageAttributes) {
-            $attributeCollection = $this->attributeCollectionFactory->create()
-                ->addFieldToFilter('is_user_defined', ['eq' => true])
-                ->addFieldToFilter('frontend_input', ['eq' => 'media_image']);
-            
-            foreach ($attributeCollection as $attribute) {
-                $this->userImageAttributes[] = $attribute->getAttributeCode();
-            }
-        }
-        return $this->userImageAttributes;
     }
 }

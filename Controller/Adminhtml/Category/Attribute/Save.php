@@ -53,6 +53,9 @@ class Save extends Attribute
      */
     private $resource;
     
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
     private $connection;
 
     /**

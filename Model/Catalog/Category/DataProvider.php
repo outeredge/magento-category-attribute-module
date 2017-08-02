@@ -8,19 +8,13 @@ use Magento\Ui\DataProvider\EavValidationRules;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\CategoryFactory;
-use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory as AttributeCollectionFactory;
 
 class DataProvider extends CategoryDataProvider
 {
     /**
-     * @var AttributeCollectionFactory
+     * @var \OuterEdge\CategoryAttribute\Helper\Data
      */
-    private $attributeCollectionFactory;
-    
-    /**
-     * @var array
-     */
-    private $userAttributes;
+    protected $categoryAttributeHelper;
     
     /**
      * @param string $name
@@ -33,7 +27,7 @@ class DataProvider extends CategoryDataProvider
      * @param Config $eavConfig
      * @param \Magento\Framework\App\RequestInterface $request
      * @param CategoryFactory $categoryFactory
-     * @param AttributeCollectionFactory $attributeCollectionFactory
+     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      * @param array $meta
      * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -49,11 +43,11 @@ class DataProvider extends CategoryDataProvider
         Config $eavConfig,
         \Magento\Framework\App\RequestInterface $request,
         CategoryFactory $categoryFactory,
-        AttributeCollectionFactory $attributeCollectionFactory,
+        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper,
         array $meta = [],
         array $data = []
     ) {
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->categoryAttributeHelper = $categoryAttributeHelper;
         
         parent::__construct(
             $name,
@@ -75,7 +69,7 @@ class DataProvider extends CategoryDataProvider
     {
         $meta = parent::prepareMeta($meta);
         
-        foreach ($this->getUserAttributes() as $attribute) {
+        foreach ($this->categoryAttributeHelper->getCustomAttributesAsArray() as $attribute) {
             if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'])) {
                 if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean') {
                     // Convert boolean attributes to Yes/No select
@@ -101,20 +95,7 @@ class DataProvider extends CategoryDataProvider
     {
         return array_merge_recursive(
             parent::getFieldsMap(),
-            ['attributes' => $this->getUserAttributes()]
+            ['attributes' => $this->getCustomAttributesAsArray()]
         );
-    }
-    
-    protected function getUserAttributes()
-    {
-        if (!$this->userAttributes) {
-            $attributeCollection = $this->attributeCollectionFactory->create()
-                ->addFieldToFilter('is_user_defined', ['eq' => true]);
-            
-            foreach ($attributeCollection as $attribute) {
-                $this->userAttributes[] = $attribute->getAttributeCode();
-            }
-        }
-        return $this->userAttributes;
     }
 }

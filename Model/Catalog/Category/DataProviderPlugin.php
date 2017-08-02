@@ -3,7 +3,6 @@
 namespace OuterEdge\CategoryAttribute\Model\Catalog\Category;
 
 use Magento\Catalog\Model\Category\DataProvider;
-use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory;
 
 class DataProviderPlugin
 {
@@ -13,25 +12,20 @@ class DataProviderPlugin
     protected $_storeManager;
     
     /**
-     * @var AttributeCollectionFactory
+     * @var \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      */
-    private $attributeCollectionFactory;
+    private $categoryAttributeHelper;
     
     /**
-     * @var array
-     */
-    private $userImageAttributes;
-
-    /**
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      */
     public function __construct(
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
     ) {
         $this->_storeManager = $storeManager;
-        $this->attributeCollectionFactory = $attributeCollectionFactory;
+        $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
     
     public function afterGetData(DataProvider $subject, array $loadedData)
@@ -45,12 +39,12 @@ class DataProviderPlugin
             return $loadedData;
         }
         
-        if (empty($this->getUserImageAttributes())) {
+        if (empty($this->categoryAttributeHelper->getCustomImageAttributesAsArray())) {
             return $loadedData;
         }
         
         foreach ($loadedData as $categoryId => $categoryData) {
-            foreach ($this->getUserImageAttributes() as $image) {
+            foreach ($this->getCustomImageAttributesAsArray() as $image) {
                 if (isset($categoryData[$image])) {
                     
                     $url = $this->_storeManager->getStore()->getBaseUrl(
@@ -66,19 +60,5 @@ class DataProviderPlugin
         }
         
         return $loadedData;
-    }
-    
-    protected function getUserImageAttributes()
-    {
-        if (!$this->userImageAttributes) {
-            $attributeCollection = $this->attributeCollectionFactory->create()
-                ->addFieldToFilter('is_user_defined', ['eq' => true])
-                ->addFieldToFilter('frontend_input', ['eq' => 'media_image']);
-            
-            foreach ($attributeCollection as $attribute) {
-                $this->userImageAttributes[] = $attribute->getAttributeCode();
-            }
-        }
-        return $this->userImageAttributes;
     }
 }

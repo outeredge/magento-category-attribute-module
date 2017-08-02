@@ -11,24 +11,24 @@ use Magento\Backend\Block\Widget\Grid\Extended as GridExtended;
 class Grid extends AbstractGrid
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory
+     * @var \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      */
-    protected $_collectionFactory;
+    protected $categoryAttributeHelper;
 
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Backend\Helper\Data $backendHelper
-     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $collectionFactory
+     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Backend\Helper\Data $backendHelper,
-        \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $collectionFactory,
+        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper,
         array $data = []
     ) {
-        $this->_collectionFactory = $collectionFactory;
         $this->_module = 'categoryattribute';
+        $this->categoryAttributeHelper = $categoryAttributeHelper;
         parent::__construct($context, $backendHelper, $data);
     }
 
@@ -39,9 +39,7 @@ class Grid extends AbstractGrid
      */
     protected function _prepareCollection()
     {
-        $collection = $this->_collectionFactory->create()
-            ->addFieldToFilter('is_user_defined', ['eq' => true]);
-            
+        $collection = $this->categoryAttributeHelper->getCustomAttributes();
         $this->setCollection($collection);
 
         return parent::_prepareCollection();
