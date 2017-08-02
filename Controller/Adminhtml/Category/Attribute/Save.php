@@ -58,47 +58,6 @@ class Save extends Attribute
      */
     private $connection;
 
-    /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory
-     * @param \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory
-     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory
-     * @param \Magento\Framework\Filter\FilterManager $filterManager
-     * @param \Magento\Catalog\Helper\Product $productHelper
-     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
-     * @param \Magento\Catalog\Setup\CategorySetupFactory $categorySetupFactory
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     *
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Cache\FrontendInterface $attributeLabelCache,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory,
-        \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory,
-        \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory,
-        \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory,
-        \Magento\Framework\Filter\FilterManager $filterManager,
-        \Magento\Catalog\Helper\Product $productHelper,
-        \Magento\Framework\View\LayoutFactory $layoutFactory,
-        \Magento\Catalog\Setup\CategorySetupFactory $categorySetupFactory
-    ) {
-        parent::__construct($context, $attributeLabelCache, $coreRegistry, $resultPageFactory);
-        $this->buildFactory = $buildFactory;
-        $this->filterManager = $filterManager;
-        $this->productHelper = $productHelper;
-        $this->attributeFactory = $attributeFactory;
-        $this->validatorFactory = $validatorFactory;
-        $this->groupCollectionFactory = $groupCollectionFactory;
-        $this->layoutFactory = $layoutFactory;
-        $this->categorysetupFactory = $categorySetupFactory;
-    }
-    */
-   
    /**
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
@@ -256,7 +215,6 @@ class Save extends Attribute
                 
                 $this->messageManager->addSuccess(__('You saved the category attribute.'));
 
-                //$this->_attributeLabelCache->clean();
                 $this->_session->setAttributeData(false);
                 
                 if ($this->getRequest()->getParam('back', false)) {

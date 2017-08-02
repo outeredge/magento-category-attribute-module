@@ -16,11 +16,6 @@ abstract class Attribute extends Action
     const ADMIN_RESOURCE = 'OuterEdge_CategoryAttribute::attributes';
 
     /**
-     * @var \Magento\Framework\Cache\FrontendInterface
-     */
-    protected $_attributeLabelCache;
-
-    /**
      * @var string
      */
     protected $_entityTypeId;
@@ -42,30 +37,6 @@ abstract class Attribute extends Action
      */
     protected $indexerFactory;
 
-    /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
-     *
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Cache\FrontendInterface $attributeLabelCache,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
-    ) {
-        $this->_coreRegistry = $coreRegistry;
-        $this->_attributeLabelCache = $attributeLabelCache;
-        $this->resultPageFactory = $resultPageFactory;
-        $this->indexerFactory = $indexerFactory;
-        parent::__construct($context);
-    }
-    */
-   
    /**
      * Constructor
      *
