@@ -200,6 +200,10 @@ class Save extends Attribute
             if (!$attributeId) {
                 $model->setEntityTypeId($this->_entityTypeId);
                 $model->setIsUserDefined(1);
+                
+                if ($model->getFrontendInput() === 'media_image') {
+                    $model->setBackendModel('Magento\Catalog\Model\Category\Attribute\Backend\Image');
+                }
             }
 
             try {
