@@ -57,7 +57,8 @@ class Data extends AbstractHelper
     public function getCustomImageAttributes()
     {
         if (!$this->customImageAttributes) {
-            $this->customImageAttributes = $this->getCustomAttributes()
+            $this->customImageAttributes = $this->attributeCollectionFactory->create()
+                ->addFieldToFilter('is_user_defined', ['eq' => true])
                 ->addFieldToFilter('frontend_input', ['eq' => 'media_image']);
         }
         return $this->customImageAttributes;
