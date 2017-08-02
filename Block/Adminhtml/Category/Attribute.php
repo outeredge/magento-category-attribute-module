@@ -11,7 +11,7 @@ class Attribute extends Container
         $this->_controller = 'adminhtml_category_attribute';
         $this->_blockGroup = 'OuterEdge_CategoryAttribute';
         $this->_headerText = __('Category Attributes');
-        $this->_addButtonLabel = __('Add New Attribute');
+        $this->_addButtonLabel = __('Create New Attribute');
         parent::_construct();
     }
 }
