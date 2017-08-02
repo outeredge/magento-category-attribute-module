@@ -44,33 +44,18 @@ class Edit extends Container
 
         parent::_construct();
 
-        if ($this->getRequest()->getParam('popup')) {
-            $this->buttonList->remove('back');
-            if ($this->getRequest()->getParam('category_tab') != 'variations') {
-                $this->addButton(
-                    'save_in_new_set',
-                    [
-                        'label' => __('Save in New Attribute Set'),
-                        'class' => 'save',
-                        'onclick' => 'saveAttributeInNewSet(\'' . __('Enter Name for New Attribute Set') . '\')'
+        $this->addButton(
+            'save_and_edit_button',
+            [
+                'label' => __('Save and Continue Edit'),
+                'class' => 'save',
+                'data_attribute' => [
+                    'mage-init' => [
+                        'button' => ['event' => 'saveAndContinueEdit', 'target' => '#edit_form'],
                     ],
-                    100
-                );
-            }
-        } else {
-            $this->addButton(
-                'save_and_edit_button',
-                [
-                    'label' => __('Save and Continue Edit'),
-                    'class' => 'save',
-                    'data_attribute' => [
-                        'mage-init' => [
-                            'button' => ['event' => 'saveAndContinueEdit', 'target' => '#edit_form'],
-                        ],
-                    ]
                 ]
-            );
-        }
+            ]
+        );
 
         $this->buttonList->update('save', 'label', __('Save Attribute'));
         $this->buttonList->update('save', 'class', 'save primary');
@@ -86,17 +71,6 @@ class Edit extends Container
         } else {
             $this->buttonList->update('delete', 'label', __('Delete Attribute'));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addButton($buttonId, $data, $level = 0, $sortOrder = 0, $region = 'toolbar')
-    {
-        if ($this->getRequest()->getParam('popup')) {
-            $region = 'header';
-        }
-        parent::addButton($buttonId, $data, $level, $sortOrder, $region);
     }
 
     /**

@@ -258,15 +258,8 @@ class Save extends Attribute
 
                 //$this->_attributeLabelCache->clean();
                 $this->_session->setAttributeData(false);
-                if ($this->getRequest()->getParam('popup')) {
-                    $requestParams = [
-                        'attributeId' => $this->getRequest()->getParam('product'),
-                        'attribute' => $model->getId(),
-                        '_current' => true,
-                        'product_tab' => $this->getRequest()->getParam('product_tab'),
-                    ];
-                    return $this->returnResult('catalog/product/addAttribute', $requestParams, ['error' => false]);
-                } elseif ($this->getRequest()->getParam('back', false)) {
+                
+                if ($this->getRequest()->getParam('back', false)) {
                     return $this->returnResult(
                         'categoryattribute/*/edit',
                         ['attribute_id' => $model->getId(), '_current' => true],
@@ -274,6 +267,7 @@ class Save extends Attribute
                     );
                 }
                 return $this->returnResult('categoryattribute/*/', [], ['error' => false]);
+                
             } catch (\Exception $e) {
                 $this->messageManager->addError($e->getMessage());
                 $this->_session->setAttributeData($data);

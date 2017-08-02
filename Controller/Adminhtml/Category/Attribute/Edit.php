@@ -28,7 +28,6 @@ class Edit extends Attribute
                 return $resultRedirect->setPath('categoryattribute/*/');
             }
 
-            // entity type check
             if ($model->getEntityTypeId() != $this->_entityTypeId) {
                 $this->messageManager->addError(__('This attribute cannot be edited.'));
                 $resultRedirect = $this->resultRedirectFactory->create();
@@ -36,7 +35,6 @@ class Edit extends Attribute
             }
         }
 
-        // set entered data if was error when we do save
         $data = $this->_objectManager->get('Magento\Backend\Model\Session')->getAttributeData(true);
         if (!empty($data)) {
             $model->addData($data);
@@ -52,9 +50,6 @@ class Edit extends Attribute
 
         $resultPage = $this->createActionPage($item);
         $resultPage->getConfig()->getTitle()->prepend($id ? $model->getName() : __('New Category Attribute'));
-        $resultPage->getLayout()
-            ->getBlock('attribute_edit_js')
-            ->setIsPopup((bool)$this->getRequest()->getParam('popup'));
         return $resultPage;
     }
 }
