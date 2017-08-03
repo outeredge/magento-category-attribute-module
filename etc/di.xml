@@ -2,6 +2,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Catalog\Model\Category\DataProvider" type="OuterEdge\CategoryAttribute\Model\Catalog\Category\DataProvider"/>
     <type name="Magento\Catalog\Model\Category\DataProvider">
-        <plugin name="OuterEdge_CategoryAttribute::categoryDataProviderPlugin" type="OuterEdge\CategoryAttribute\Model\Catalog\Category\DataProviderPlugin"/>
+        <plugin name="OuterEdge_CategoryAttribute::categoryDataProviderPlugin" type="OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Category\DataProvider"/>
+    </type>
+    <type name="Magento\Catalog\Model\Product\Media\Config">
+        <plugin name="OuterEdge_CategoryAttribute::productMediaConfigPlugin" type="OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Product\Media\Config"/>
     </type>
 </config>

@@ -1,11 +1,8 @@
 <?php
 
-namespace OuterEdge\CategoryAttribute\Model\Catalog\Category;
+namespace OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Category;
 
-use Magento\Catalog\Model\Category\DataProvider;
-use Magento\Framework\UrlInterface;
-
-class DataProviderPlugin
+class DataProvider
 {
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -29,7 +26,7 @@ class DataProviderPlugin
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
     
-    public function afterGetData(DataProvider $subject, array $loadedData)
+    public function afterGetData(\Magento\Catalog\Model\Category\DataProvider $subject, array $loadedData)
     {
         if (empty($loadedData)) {
             return $loadedData;
@@ -49,7 +46,7 @@ class DataProviderPlugin
                 if (isset($categoryData[$image])) {
                     
                     $url = $this->storeManager->getStore()->getBaseUrl(
-                        UrlInterface::URL_TYPE_MEDIA
+                        \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
                     ) . 'catalog/category/' . $categoryData[$image];
                     
                     $loadedData[$categoryId][$image] = [[
