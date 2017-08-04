@@ -4,7 +4,6 @@ php:
   - 7.1
 directories:
   - $HOME/.composer/cache/files
-  - $HOME/.config/composer
 install: composer global require "squizlabs/php_codesniffer=*" --no-interaction --prefer-dist
 script:
   - composer install --no-interaction --prefer-dist
