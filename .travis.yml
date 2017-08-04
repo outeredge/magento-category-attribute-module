@@ -8,5 +8,5 @@ directories:
 install: composer global require "squizlabs/php_codesniffer=*" --no-interaction --prefer-dist
 script:
   - composer install --no-interaction --prefer-dist
-  - ll ~/.config
+  - ls -la ~/.config/
   - ~/.config/composer/vendor/bin/phpcs .  --runtime-set ignore_warnings_on_exit 1
