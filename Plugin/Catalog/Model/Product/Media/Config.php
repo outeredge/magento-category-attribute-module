@@ -2,23 +2,26 @@
 
 namespace OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Product\Media;
 
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
+use Magento\Catalog\Model\Product\Media\Config as MediaConfig;
+
 class Config
 {
     /**
-     * @var \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @var CategoryAttributeHelper $categoryAttributeHelper
      */
     private $categoryAttributeHelper;
-    
+
     /**
-     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @param CategoryAttributeHelper $categoryAttributeHelper
      */
     public function __construct(
-        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+        CategoryAttributeHelper $categoryAttributeHelper
     ) {
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
-    
-    public function afterGetMediaAttributeCodes(\Magento\Catalog\Model\Product\Media\Config $subject, $attributeCodes)
+
+    public function afterGetMediaAttributeCodes(MediaConfig $subject, $attributeCodes)
     {
         return array_diff($attributeCodes, $this->categoryAttributeHelper->getCustomImageAttributesAsArray());
     }

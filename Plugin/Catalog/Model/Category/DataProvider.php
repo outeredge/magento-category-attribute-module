@@ -2,53 +2,56 @@
 
 namespace OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Category;
 
+use Magento\Store\Model\StoreManagerInterface;
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
+use Magento\Catalog\Model\Category\DataProvider as CategoryDataProvider;
+
 class DataProvider
 {
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     protected $storeManager;
-    
+
     /**
-     * @var \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @var CategoryAttributeHelper $categoryAttributeHelper
      */
     private $categoryAttributeHelper;
-    
+
     /**
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @param StoreManagerInterface $storeManager
+     * @param CategoryAttributeHelper $categoryAttributeHelper
      */
     public function __construct(
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+        StoreManagerInterface $storeManager,
+        CategoryAttributeHelper $categoryAttributeHelper
     ) {
         $this->storeManager = $storeManager;
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
-    
-    public function afterGetData(\Magento\Catalog\Model\Category\DataProvider $subject, array $loadedData)
+
+    public function afterGetData(CategoryDataProvider $subject, array $loadedData)
     {
         if (empty($loadedData)) {
             return $loadedData;
         }
-        
+
         $category = $subject->getCurrentCategory();
         if (!$category) {
             return $loadedData;
         }
-        
+
         if (empty($this->categoryAttributeHelper->getCustomImageAttributesAsArray())) {
             return $loadedData;
         }
-        
+
         foreach ($loadedData as $categoryId => $categoryData) {
             foreach ($this->categoryAttributeHelper->getCustomImageAttributesAsArray() as $image) {
                 if (isset($categoryData[$image])) {
-                    
                     $url = $this->storeManager->getStore()->getBaseUrl(
                         \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
                     ) . 'catalog/category/' . $categoryData[$image];
-                    
+
                     $loadedData[$categoryId][$image] = [[
                         'name' => $categoryData[$image],
                         'url'  => $url
@@ -56,7 +59,7 @@ class DataProvider
                 }
             }
         }
-        
+
         return $loadedData;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace OuterEdge\CategoryAttribute\Model\Catalog\Category;
 
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 use Magento\Catalog\Model\Category\DataProvider as CategoryDataProvider;
 use Magento\Eav\Model\Config;
 use Magento\Ui\DataProvider\EavValidationRules;
@@ -12,10 +13,10 @@ use Magento\Catalog\Model\CategoryFactory;
 class DataProvider extends CategoryDataProvider
 {
     /**
-     * @var \OuterEdge\CategoryAttribute\Helper\Data
+     * @var CategoryAttributeHelper
      */
     protected $categoryAttributeHelper;
-    
+
     /**
      * @param string $name
      * @param string $primaryFieldName
@@ -27,7 +28,7 @@ class DataProvider extends CategoryDataProvider
      * @param Config $eavConfig
      * @param \Magento\Framework\App\RequestInterface $request
      * @param CategoryFactory $categoryFactory
-     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @param CategoryAttributeHelper $categoryAttributeHelper
      * @param array $meta
      * @param array $data
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -43,12 +44,12 @@ class DataProvider extends CategoryDataProvider
         Config $eavConfig,
         \Magento\Framework\App\RequestInterface $request,
         CategoryFactory $categoryFactory,
-        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper,
+        CategoryAttributeHelper $categoryAttributeHelper,
         array $meta = [],
         array $data = []
     ) {
         $this->categoryAttributeHelper = $categoryAttributeHelper;
-        
+
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -64,11 +65,18 @@ class DataProvider extends CategoryDataProvider
             $data
         );
     }
-    
+
+    /**
+     * Convert Yes/No attribute to dropdown on category edit page
+     * Convert Image attribute to file uploader on category edit page
+     *
+     * @param array $meta
+     * @return array
+     */
     public function prepareMeta($meta)
     {
         $meta = parent::prepareMeta($meta);
-        
+
         foreach ($this->categoryAttributeHelper->getCustomAttributesAsArray() as $attribute) {
             if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'])) {
                 if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean') {
@@ -76,8 +84,7 @@ class DataProvider extends CategoryDataProvider
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
-                } 
-                else if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'media_image') {
+                } elseif ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'media_image') {
                     // Convert media_image attributes to image uploader
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'image';
                     $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'fileUploader';
@@ -87,10 +94,15 @@ class DataProvider extends CategoryDataProvider
                 }
             }
         }
-        
+
         return $meta;
     }
-    
+
+    /**
+     * Extend base Magento fields map with custom created attributes
+     *
+     * @return array
+     */
     protected function getFieldsMap()
     {
         return array_merge_recursive(

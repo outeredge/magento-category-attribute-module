@@ -3,8 +3,15 @@
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category;
 
 use Magento\Backend\App\Action;
-use Magento\Framework\Controller\Result;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Indexer\IndexerInterfaceFactory;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Phrase;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Catalog\Model\Indexer\Category\Flat\State;
 
 abstract class Attribute extends Action
 {
@@ -21,50 +28,46 @@ abstract class Attribute extends Action
     protected $_entityTypeId;
 
     /**
-     * Core registry
-     *
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     protected $_coreRegistry = null;
 
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var PageFactory
      */
     protected $resultPageFactory;
-    
+
     /**
-     * @var \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
+     * @var IndexerInterfaceFactory $indexerFactory
      */
     protected $indexerFactory;
 
    /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param IndexerInterfaceFactory $indexerFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
+        Context $context,
+        Registry $coreRegistry,
+        PageFactory $resultPageFactory,
+        IndexerInterfaceFactory $indexerFactory
     ) {
         $this->_coreRegistry = $coreRegistry;
         $this->resultPageFactory = $resultPageFactory;
         $this->indexerFactory = $indexerFactory;
         parent::__construct($context);
     }
-    
+
 
     /**
      * Dispatch request
      *
-     * @param \Magento\Framework\App\RequestInterface $request
-     * @return \Magento\Framework\App\ResponseInterface
+     * @param RequestInterface $request
+     * @return ResponseInterface
      */
-    public function dispatch(\Magento\Framework\App\RequestInterface $request)
+    public function dispatch(RequestInterface $request)
     {
         $this->_entityTypeId = $this->_objectManager->create(
             'Magento\Eav\Model\Entity'
@@ -75,12 +78,12 @@ abstract class Attribute extends Action
     }
 
     /**
-     * @param \Magento\Framework\Phrase|null $title
-     * @return \Magento\Backend\Model\View\Result\Page
+     * @param Phrase|null $title
+     * @return Page
      */
     protected function createActionPage($title = null)
     {
-        /** @var \Magento\Backend\Model\View\Result\Page $resultPage */
+        /** @var Page $resultPage */
         $resultPage = $this->resultPageFactory->create();
         $resultPage->addBreadcrumb(__('Catalog'), __('Catalog'))
             ->addBreadcrumb(__('Manage Category Attributes'), __('Manage Category Attributes'))
@@ -115,17 +118,17 @@ abstract class Attribute extends Action
         }
         return $code;
     }
-    
+
     /**
      * Reindex the category flat data
      * Needed when adding/deleting attributes
-     * 
+     *
      * @return null
      */
     protected function reindexCategoryFlatData()
     {
         $this->indexerFactory->create()
-            ->load(\Magento\Catalog\Model\Indexer\Category\Flat\State::INDEXER_ID)
+            ->load(State::INDEXER_ID)
             ->reindexAll();
     }
 }

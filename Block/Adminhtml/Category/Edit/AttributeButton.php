@@ -8,7 +8,7 @@ use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 class AttributeButton extends Template implements ButtonProviderInterface
 {
     /**
-     * Attribute button
+     * Attribute button for category edit page
      *
      * @return array
      */
@@ -22,4 +22,4 @@ class AttributeButton extends Template implements ButtonProviderInterface
             'sort_order' => 20
         ];
     }
-} 
+}

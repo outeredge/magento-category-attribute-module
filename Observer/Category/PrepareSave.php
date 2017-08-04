@@ -4,26 +4,27 @@ namespace OuterEdge\CategoryAttribute\Observer\Category;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 
 class PrepareSave implements ObserverInterface
 {
     /**
-     * @var \OuterEdge\CategoryAttribute\Helper\Data
+     * @var CategoryAttributeHelper
      */
     protected $categoryAttributeHelper;
-    
+
     /**
-     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @param CategoryAttributeHelper $categoryAttributeHelper
      */
     public function __construct(
-        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+        CategoryAttributeHelper $categoryAttributeHelper
     ) {
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
-    
+
     /**
      * Prepare image data
-     * 
+     *
      * @param Observer $observer
      * @return $this
      */
@@ -32,10 +33,10 @@ class PrepareSave implements ObserverInterface
         if (empty($this->categoryAttributeHelper->getCustomImageAttributesAsArray())) {
             return $this;
         }
-        
+
         $category = $observer->getCategory();
         $data = $observer->getRequest()->getPostValue();
-        
+
         foreach ($this->categoryAttributeHelper->getCustomImageAttributesAsArray() as $image) {
             if (empty($data[$image])) {
                 $category->setData($image, null);
@@ -56,7 +57,7 @@ class PrepareSave implements ObserverInterface
                 }
             }
         }
-        
+
         return $this;
     }
 }
