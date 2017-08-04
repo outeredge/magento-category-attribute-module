@@ -3,8 +3,7 @@
     "description": "Magento Category Attribute Module by outer/edge",
     "type": "magento2-module",
     "license": [
-        "OSL-3.0",
-        "AFL-3.0"
+        "MIT"
     ],
     "authors": [
         {
