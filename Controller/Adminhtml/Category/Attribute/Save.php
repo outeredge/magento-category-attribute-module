@@ -1,107 +1,89 @@
 <?php
 
-// @codingStandardsIgnoreFile
-
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
 use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
-use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory;
+use Magento\Eav\Model\EntityFactory;
+use Magento\Framework\Indexer\IndexerInterfaceFactory;
+use Magento\Catalog\Helper\Product as ProductHelper;
+use Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory;
+use Magento\Catalog\Model\Product\UrlFactory;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
+use Zend_Validate_Regex;
+use Exception;
 
 /**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD)
  */
 class Save extends Attribute
 {
     /**
-     * @var \Magento\Catalog\Model\Product\AttributeSet\BuildFactory
-     */
-    protected $buildFactory;
-
-    /**
-     * @var \Magento\Framework\Filter\FilterManager
-     */
-    protected $filterManager;
-
-    /**
-     * @var \Magento\Catalog\Helper\Product
+     * @var ProductHelper
      */
     protected $productHelper;
 
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory
-     */
-    protected $attributeFactory;
-
-    /**
-     * @var \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory
+     * @var ValidatorFactory
      */
     protected $validatorFactory;
 
     /**
-     * @var \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory
+     * @var UrlFactory
      */
-    protected $groupCollectionFactory;
+    protected $urlFactory;
 
     /**
-     * @var \Magento\Framework\View\LayoutFactory
-     */
-    private $layoutFactory;
-    
-    /**
-     * @var \Magento\Framework\App\ResourceConnection
+     * @var ResourceConnection
      */
     private $resource;
-    
-    /**
-     * @var \Magento\Framework\DB\Adapter\AdapterInterface
-     */
-    private $connection;
 
-   /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
-     * @param \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory
-     * @param \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory
-     * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory
-     * @param \Magento\Framework\Filter\FilterManager $filterManager
-     * @param \Magento\Catalog\Helper\Product $productHelper
-     * @param \Magento\Framework\View\LayoutFactory $layoutFactory
-     * @param \Magento\Framework\App\ResourceConnection $resource
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+    /**
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param AttributeFactory $attributeFactory
+     * @param EntityFactory $entityFactory
+     * @param IndexerInterfaceFactory $indexerFactory
+     * @param ProductHelper $productHelper
+     * @param ValidatorFactory $validatorFactory
+     * @param UrlFactory $urlFactory
+     * @param ResourceConnection $resource
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory,
-        \Magento\Catalog\Model\Product\AttributeSet\BuildFactory $buildFactory,
-        \Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory $attributeFactory,
-        \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory,
-        \Magento\Eav\Model\ResourceModel\Entity\Attribute\Group\CollectionFactory $groupCollectionFactory,
-        \Magento\Framework\Filter\FilterManager $filterManager,
-        \Magento\Catalog\Helper\Product $productHelper,
-        \Magento\Framework\View\LayoutFactory $layoutFactory,
-        \Magento\Framework\App\ResourceConnection $resource
+        Context $context,
+        Registry $coreRegistry,
+        PageFactory $resultPageFactory,
+        AttributeFactory $attributeFactory,
+        EntityFactory $entityFactory,
+        IndexerInterfaceFactory $indexerFactory,
+        ProductHelper $productHelper,
+        ValidatorFactory $validatorFactory,
+        UrlFactory $urlFactory,
+        ResourceConnection $resource
     ) {
-        $this->buildFactory = $buildFactory;
-        $this->filterManager = $filterManager;
         $this->productHelper = $productHelper;
-        $this->attributeFactory = $attributeFactory;
         $this->validatorFactory = $validatorFactory;
-        $this->groupCollectionFactory = $groupCollectionFactory;
-        $this->layoutFactory = $layoutFactory;
-        $this->indexerFactory = $indexerFactory;
+        $this->urlFactory = $urlFactory;
         $this->resource = $resource;
-        $this->connection = $resource->getConnection(\Magento\Framework\App\ResourceConnection::DEFAULT_CONNECTION);
-        parent::__construct($context, $coreRegistry, $resultPageFactory, $indexerFactory);
+        parent::__construct(
+            $context,
+            $coreRegistry,
+            $resultPageFactory,
+            $attributeFactory,
+            $entityFactory,
+            $indexerFactory
+        );
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Redirect
+     * @return Redirect
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -114,7 +96,7 @@ class Save extends Attribute
             $attributeCode = $this->getRequest()->getParam('attribute_code')
                 ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
             if (strlen($attributeCode) > 0) {
-                $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,30}$/']);
+                $validatorAttrCode = new Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,30}$/']);
                 if (!$validatorAttrCode->isValid($attributeCode)) {
                     $this->messageManager->addError(
                         __(
@@ -132,9 +114,7 @@ class Save extends Attribute
             }
             $data['attribute_code'] = $attributeCode;
 
-            //validate frontend_input
             if (isset($data['frontend_input'])) {
-                /** @var $inputType \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\Validator */
                 $inputType = $this->validatorFactory->create();
                 if (!$inputType->isValid($data['frontend_input'])) {
                     foreach ($inputType->getMessages() as $message) {
@@ -148,16 +128,16 @@ class Save extends Attribute
                 }
             }
 
-            /* @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
             $model = $this->attributeFactory->create();
 
             if ($attributeId) {
                 $model->load($attributeId);
+
                 if (!$model->getId()) {
                     $this->messageManager->addError(__('This attribute no longer exists.'));
                     return $this->returnResult('categoryattribute/*/', [], ['error' => true]);
                 }
-                // entity type check
+
                 if ($model->getEntityTypeId() != $this->_entityTypeId) {
                     $this->messageManager->addError(__('We can\'t update the attribute.'));
                     $this->_session->setAttributeData($data);
@@ -168,20 +148,13 @@ class Save extends Attribute
                 $data['is_user_defined'] = $model->getIsUserDefined();
                 $data['frontend_input'] = $model->getFrontendInput();
             } else {
-                /**
-                 * @todo add to helper and specify all relations for properties
-                 */
-                $data['source_model'] = $this->productHelper->getAttributeSourceModelByInputType(
-                    $data['frontend_input']
-                );
-                $data['backend_model'] = $this->productHelper->getAttributeBackendModelByInputType(
-                    $data['frontend_input']
-                );
+                $data['source_model'] = $this->productHelper->getAttributeSourceModelByInputType($data['frontend_input']);
+                $data['backend_model'] = $this->productHelper->getAttributeBackendModelByInputType($data['frontend_input']);
             }
 
             $data += ['is_filterable' => 0, 'is_filterable_in_search' => 0, 'apply_to' => []];
 
-            if (is_null($model->getIsUserDefined()) || $model->getIsUserDefined() != 0) {
+            if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {
                 $data['backend_type'] = $model->getBackendTypeByInput($data['frontend_input']);
             }
 
@@ -191,7 +164,6 @@ class Save extends Attribute
             }
 
             if (!$model->getIsUserDefined() && $model->getId()) {
-                // Unset attribute field for system attributes
                 unset($data['apply_to']);
             }
 
@@ -200,7 +172,7 @@ class Save extends Attribute
             if (!$attributeId) {
                 $model->setEntityTypeId($this->_entityTypeId);
                 $model->setIsUserDefined(1);
-                
+
                 if ($model->getFrontendInput() === 'media_image') {
                     $model->setBackendModel('Magento\Catalog\Model\Category\Attribute\Backend\Image');
                 }
@@ -208,19 +180,16 @@ class Save extends Attribute
 
             try {
                 $model->save();
-                
+
                 if (!$attributeId) {
-                    $attributeSetId = 3;
-                    $groupId = 4;
-                    $attributeId = $model->getAttributeId();
-                    $this->addAttributeToGroup($this->_entityTypeId, $attributeSetId, $groupId, $attributeId, 100);
+                    $this->addAttributeToGroup($model->getAttributeId());
                     $this->reindexCategoryFlatData();
                 }
-                
+
                 $this->messageManager->addSuccess(__('You saved the category attribute.'));
 
                 $this->_session->setAttributeData(false);
-                
+
                 if ($this->getRequest()->getParam('back', false)) {
                     return $this->returnResult(
                         'categoryattribute/*/edit',
@@ -229,8 +198,7 @@ class Save extends Attribute
                     );
                 }
                 return $this->returnResult('categoryattribute/*/', [], ['error' => false]);
-                
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->messageManager->addError($e->getMessage());
                 $this->_session->setAttributeData($data);
                 return $this->returnResult(
@@ -247,22 +215,19 @@ class Save extends Attribute
      * @param string $path
      * @param array $params
      * @param array $response
-     * @return \Magento\Framework\Controller\Result\Json|\Magento\Backend\Model\View\Result\Redirect
+     * @return Json|Redirect
      */
     private function returnResult($path = '', array $params = [], array $response = [])
     {
         if ($this->isAjax()) {
             $layout = $this->layoutFactory->create();
             $layout->initMessages();
-
             $response['messages'] = [$layout->getMessagesBlock()->getGroupedHtml()];
             $response['params'] = $params;
             return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
         }
         return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath($path, $params);
-
     }
-
     /**
      * Define whether request is Ajax
      *
@@ -272,23 +237,47 @@ class Save extends Attribute
     {
         return $this->getRequest()->getParam('isAjax');
     }
-    
-    private function addAttributeToGroup($entityType, $setId, $groupId, $attributeId, $sortOrder = null)
+
+    /**
+     * Generate code from label
+     *
+     * @param string $label
+     * @return string
+     */
+    protected function generateCode($label)
     {
-        $entityType = 3;
-        $setId = $setId;
-        $groupId = $groupId;
-        $attributeId = $attributeId;
+        $code = substr(
+            preg_replace(
+                '/[^a-z_0-9]/',
+                '_',
+                $this->urlFactory->create()->formatUrlKey($label)
+            ),
+            0,
+            30
+        );
+        $validatorAttrCode = new Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
+        if (!$validatorAttrCode->isValid($code)) {
+            $code = 'attr_' . ($code ?: substr(md5(time()), 0, 8));
+        }
+        return $code;
+    }
+
+    private function addAttributeToGroup($attributeId, $sortOrder = null)
+    {
+        $setId = 3;
+        $groupId = 4;
 
         $data = [
-            'entity_type_id' => $entityType,
+            'entity_type_id' => $this->_entityTypeId,
             'attribute_set_id' => $setId,
             'attribute_group_id' => $groupId,
             'attribute_id' => $attributeId,
         ];
 
-        $bind = ['entity_type_id' => $entityType, 'attribute_set_id' => $setId, 'attribute_id' => $attributeId];
-        $select = $this->connection->select()->from(
+        $connection = $this->resource->getConnection(ResourceConnection::DEFAULT_CONNECTION);
+
+        $bind = ['entity_type_id' => $this->_entityTypeId, 'attribute_set_id' => $setId, 'attribute_id' => $attributeId];
+        $select = $connection->select()->from(
             $this->resource->getTableName('eav_entity_attribute')
         )->where(
             'entity_type_id = :entity_type_id'
@@ -297,21 +286,20 @@ class Save extends Attribute
         )->where(
             'attribute_id = :attribute_id'
         );
-        $row = $this->connection->fetchRow($select, $bind);
+        $row = $connection->fetchRow($select, $bind);
         if ($row) {
-            // update
             if ($sortOrder !== null) {
                 $data['sort_order'] = $sortOrder;
             }
 
-            $this->connection->update(
+            $connection->update(
                 $this->resource->getTableName('eav_entity_attribute'),
                 $data,
-                $this->connection->quoteInto('entity_attribute_id=?', $row['entity_attribute_id'])
+                $connection->quoteInto('entity_attribute_id=?', $row['entity_attribute_id'])
             );
         } else {
             if ($sortOrder === null) {
-                $select = $this->connection->select()->from(
+                $select = $connection->select()->from(
                     $this->resource->getTableName('eav_entity_attribute'),
                     'MAX(sort_order)'
                 )->where(
@@ -322,13 +310,13 @@ class Save extends Attribute
                     'attribute_id = :attribute_id'
                 );
 
-                $sortOrder = $this->connection->fetchOne($select, $bind) + 10;
+                $sortOrder = $connection->fetchOne($select, $bind) + 10;
             }
             $sortOrder = is_numeric($sortOrder) ? $sortOrder : 1;
             $data['sort_order'] = $sortOrder;
-            $this->connection->insert($this->resource->getTableName('eav_entity_attribute'), $data);
+            $connection->insert($this->resource->getTableName('eav_entity_attribute'), $data);
         }
 
         return $this;
-    }    
+    }
 }

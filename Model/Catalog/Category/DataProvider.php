@@ -2,20 +2,22 @@
 
 namespace OuterEdge\CategoryAttribute\Model\Catalog\Category;
 
-use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 use Magento\Catalog\Model\Category\DataProvider as CategoryDataProvider;
-use Magento\Eav\Model\Config;
 use Magento\Ui\DataProvider\EavValidationRules;
 use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Registry;
+use Magento\Eav\Model\Config;
+use Magento\Framework\App\RequestInterface;
 use Magento\Catalog\Model\CategoryFactory;
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 
 class DataProvider extends CategoryDataProvider
 {
     /**
      * @var CategoryAttributeHelper
      */
-    protected $categoryAttributeHelper;
+    private $categoryAttributeHelper;
 
     /**
      * @param string $name
@@ -24,14 +26,13 @@ class DataProvider extends CategoryDataProvider
      * @param EavValidationRules $eavValidationRules
      * @param CategoryCollectionFactory $categoryCollectionFactory
      * @param StoreManagerInterface $storeManager
-     * @param \Magento\Framework\Registry $registry
+     * @param Registry $registry
      * @param Config $eavConfig
-     * @param \Magento\Framework\App\RequestInterface $request
+     * @param RequestInterface $request
      * @param CategoryFactory $categoryFactory
      * @param CategoryAttributeHelper $categoryAttributeHelper
      * @param array $meta
      * @param array $data
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         $name,
@@ -40,16 +41,15 @@ class DataProvider extends CategoryDataProvider
         EavValidationRules $eavValidationRules,
         CategoryCollectionFactory $categoryCollectionFactory,
         StoreManagerInterface $storeManager,
-        \Magento\Framework\Registry $registry,
+        Registry $registry,
         Config $eavConfig,
-        \Magento\Framework\App\RequestInterface $request,
+        RequestInterface $request,
         CategoryFactory $categoryFactory,
         CategoryAttributeHelper $categoryAttributeHelper,
         array $meta = [],
         array $data = []
     ) {
         $this->categoryAttributeHelper = $categoryAttributeHelper;
-
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -78,19 +78,24 @@ class DataProvider extends CategoryDataProvider
         $meta = parent::prepareMeta($meta);
 
         foreach ($this->categoryAttributeHelper->getCustomAttributesAsArray() as $attribute) {
-            if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'])) {
-                if ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'boolean') {
-                    // Convert boolean attributes to Yes/No select
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'select';
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'select';
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['default'] = 0;
-                } elseif ($meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] === 'media_image') {
-                    // Convert media_image attributes to image uploader
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['dataType'] = 'image';
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['formElement'] = 'fileUploader';
-                    $meta['attributes']['children'][$attribute]['arguments']['data']['config']['uploaderConfig'] = [
-                        'url' => 'categoryattribute/category_image/upload/attribute_code/' . $attribute
-                    ];
+            if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config'])) {
+                $attributeConfig = &$meta['attributes']['children'][$attribute]['arguments']['data']['config'];
+                if (isset($attributeConfig['dataType'])) {
+                    if ($attributeConfig['dataType'] === 'boolean') {
+                        $attributeConfig = array_merge($attributeConfig, [
+                            'dataType'    => 'select',
+                            'formElement' => 'select',
+                            'default'     => 0
+                        ]);
+                    } elseif ($attributeConfig['dataType'] === 'media_image') {
+                        $attributeConfig = array_merge($attributeConfig, [
+                            'dataType'       => 'image',
+                            'formElement'    => 'fileUploader',
+                            'uploaderConfig' => [
+                                'url' => 'categoryattribute/category_image/upload/attribute_code/' . $attribute
+                            ]
+                        ]);
+                    }
                 }
             }
         }

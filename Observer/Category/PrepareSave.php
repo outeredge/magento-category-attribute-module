@@ -11,7 +11,7 @@ class PrepareSave implements ObserverInterface
     /**
      * @var CategoryAttributeHelper
      */
-    protected $categoryAttributeHelper;
+    private $categoryAttributeHelper;
 
     /**
      * @param CategoryAttributeHelper $categoryAttributeHelper

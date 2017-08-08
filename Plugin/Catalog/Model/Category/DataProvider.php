@@ -5,13 +5,14 @@ namespace OuterEdge\CategoryAttribute\Plugin\Catalog\Model\Category;
 use Magento\Store\Model\StoreManagerInterface;
 use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 use Magento\Catalog\Model\Category\DataProvider as CategoryDataProvider;
+use Magento\Framework\UrlInterface;
 
 class DataProvider
 {
     /**
      * @var StoreManagerInterface
      */
-    protected $storeManager;
+    private $storeManager;
 
     /**
      * @var CategoryAttributeHelper $categoryAttributeHelper
@@ -49,7 +50,7 @@ class DataProvider
             foreach ($this->categoryAttributeHelper->getCustomImageAttributesAsArray() as $image) {
                 if (isset($categoryData[$image])) {
                     $url = $this->storeManager->getStore()->getBaseUrl(
-                        \Magento\Framework\UrlInterface::URL_TYPE_MEDIA
+                        UrlInterface::URL_TYPE_MEDIA
                     ) . 'catalog/category/' . $categoryData[$image];
 
                     $loadedData[$categoryId][$image] = [[

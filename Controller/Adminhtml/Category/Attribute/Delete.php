@@ -3,21 +3,23 @@
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
 use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
+use Magento\Backend\Model\View\Result\Redirect;
+use Exception;
 
 class Delete extends Attribute
 {
     /**
-     * @return \Magento\Backend\Model\View\Result\Redirect
+     * @return Redirect
      */
     public function execute()
     {
         $id = $this->getRequest()->getParam('attribute_id');
         $resultRedirect = $this->resultRedirectFactory->create();
-        if ($id) {
-            $model = $this->_objectManager->create('Magento\Catalog\Model\ResourceModel\Eav\Attribute');
 
-            // entity type check
+        if ($id) {
+            $model = $this->attributeFactory->create();
             $model->load($id);
+
             if ($model->getEntityTypeId() != $this->_entityTypeId) {
                 $this->messageManager->addError(__('We can\'t delete the attribute.'));
                 return $resultRedirect->setPath('categoryattribute/*/');
@@ -28,7 +30,7 @@ class Delete extends Attribute
                 $this->reindexCategoryFlatData();
                 $this->messageManager->addSuccess(__('You deleted the category attribute.'));
                 return $resultRedirect->setPath('categoryattribute/*/');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->messageManager->addError($e->getMessage());
                 return $resultRedirect->setPath(
                     'categoryattribute/*/edit',
@@ -36,6 +38,7 @@ class Delete extends Attribute
                 );
             }
         }
+
         $this->messageManager->addError(__('We can\'t find an attribute to delete.'));
         return $resultRedirect->setPath('categoryattribute/*/');
     }

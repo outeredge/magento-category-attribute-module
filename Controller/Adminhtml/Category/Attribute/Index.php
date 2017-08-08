@@ -3,11 +3,12 @@
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
 use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
+use Magento\Backend\Model\View\Result\Page;
 
 class Index extends Attribute
 {
     /**
-     * @return \Magento\Backend\Model\View\Result\Page
+     * @return Page
      */
     public function execute()
     {

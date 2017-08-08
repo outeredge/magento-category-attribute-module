@@ -3,28 +3,27 @@
 namespace OuterEdge\CategoryAttribute\Block\Adminhtml\Category\Attribute;
 
 use Magento\Eav\Block\Adminhtml\Attribute\Grid\AbstractGrid;
-use Magento\Backend\Block\Widget\Grid\Extended as GridExtended;
+use Magento\Backend\Block\Template\Context;
+use Magento\Backend\Helper\Data as BackendHelper;
+use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 
-/**
- * @SuppressWarnings(PHPMD.DepthOfInheritance)
- */
 class Grid extends AbstractGrid
 {
     /**
-     * @var \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @var CategoryAttributeHelper $categoryAttributeHelper
      */
-    protected $categoryAttributeHelper;
+    private $categoryAttributeHelper;
 
     /**
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Backend\Helper\Data $backendHelper
-     * @param \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper
+     * @param Context $context
+     * @param BackendHelper $backendHelper
+     * @param CategoryAttributeHelper $categoryAttributeHelper
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \Magento\Backend\Helper\Data $backendHelper,
-        \OuterEdge\CategoryAttribute\Helper\Data $categoryAttributeHelper,
+        Context $context,
+        BackendHelper $backendHelper,
+        CategoryAttributeHelper $categoryAttributeHelper,
         array $data = []
     ) {
         $this->_module = 'categoryattribute';
@@ -41,7 +40,6 @@ class Grid extends AbstractGrid
     {
         $collection = $this->categoryAttributeHelper->getCustomAttributes();
         $this->setCollection($collection);
-
         return parent::_prepareCollection();
     }
 
@@ -52,8 +50,8 @@ class Grid extends AbstractGrid
      */
     protected function _prepareColumns()
     {
-        GridExtended::_prepareColumns();
-        
+        $this->sortColumnsByOrder();
+
         $this->addColumn(
             'attribute_code',
             [
@@ -75,7 +73,7 @@ class Grid extends AbstractGrid
                 'column_css_class' => 'col-label'
             ]
         );
-        
+
         $this->_eventManager->dispatch('category_attribute_grid_build', ['grid' => $this]);
 
         return $this;

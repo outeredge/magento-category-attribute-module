@@ -3,22 +3,21 @@
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
 use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
+use Magento\Framework\Controller\ResultInterface;
 
 class Edit extends Attribute
 {
     /**
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function execute()
     {
         $id = $this->getRequest()->getParam('attribute_id');
-        /** @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
-        $model = $this->_objectManager->create(
-            'Magento\Catalog\Model\ResourceModel\Eav\Attribute'
-        )->setEntityTypeId(
-            $this->_entityTypeId
-        );
+
+        $model = $this->attributeFactory->create()
+            ->setEntityTypeId($this->_entityTypeId);
+
         if ($id) {
             $model->load($id);
 
@@ -35,7 +34,7 @@ class Edit extends Attribute
             }
         }
 
-        $data = $this->_objectManager->get('Magento\Backend\Model\Session')->getAttributeData(true);
+        $data = $this->_session->getAttributeData(true);
         if (!empty($data)) {
             $model->addData($data);
         }

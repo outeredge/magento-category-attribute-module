@@ -3,48 +3,52 @@
 namespace OuterEdge\CategoryAttribute\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Framework\Model\Context;
+use Magento\Framework\App\Helper\Context;
+use Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection;
 
 class Data extends AbstractHelper
 {
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+     * @var CollectionFactory $attributeCollectionFactory
      */
-    protected $attributeCollectionFactory;
-    
+    private $attributeCollectionFactory;
+
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection
+     * @var Collection
      */
-    protected $customAttributes;
-    
+    private $customAttributes;
+
     /**
-     * @var \Magento\Catalog\Model\ResourceModel\Category\Attribute\Collection
+     * @var Collection
      */
-    protected $customImageAttributes;
-    
-    /**
-     * @var array
-     */
-    protected $customAttributesArray;
-    
+    private $customImageAttributes;
+
     /**
      * @var array
      */
-    protected $customImageAttributesArray;
-    
+    private $customAttributesArray;
+
     /**
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
-     * @codeCoverageIgnore
+     * @var array
+     */
+    private $customImageAttributesArray;
+
+    /**
+     * @param Context $context
+     * @param CollectionFactory $attributeCollectionFactory
      */
     public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Catalog\Model\ResourceModel\Category\Attribute\CollectionFactory $attributeCollectionFactory
+        Context $context,
+        CollectionFactory $attributeCollectionFactory
     ) {
         $this->attributeCollectionFactory = $attributeCollectionFactory;
         parent::__construct($context);
     }
-    
+
+    /**
+     * @return Collection
+     */
     public function getCustomAttributes()
     {
         if (!$this->customAttributes) {
@@ -53,7 +57,10 @@ class Data extends AbstractHelper
         }
         return $this->customAttributes;
     }
-    
+
+    /**
+     * @return Collection
+     */
     public function getCustomImageAttributes()
     {
         if (!$this->customImageAttributes) {
@@ -63,7 +70,10 @@ class Data extends AbstractHelper
         }
         return $this->customImageAttributes;
     }
-    
+
+    /**
+     * @return array
+     */
     public function getCustomAttributesAsArray()
     {
         if (!$this->customAttributesArray) {
@@ -74,7 +84,10 @@ class Data extends AbstractHelper
         }
         return $this->customAttributesArray;
     }
-    
+
+    /**
+     * @return array
+     */
     public function getCustomImageAttributesAsArray()
     {
         if (!$this->customImageAttributesArray) {

@@ -2,39 +2,35 @@
 
 namespace OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
 
-use OuterEdge\CategoryAttribute\Controller\Adminhtml\Category\Attribute;
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\ForwardFactory;
+use Magento\Backend\Model\View\Result\Forward;
 
-class NewAction extends Attribute
+class NewAction extends Action
 {
     /**
-     * @var \Magento\Backend\Model\View\Result\ForwardFactory
+     * @var ForwardFactory
      */
-    protected $resultForwardFactory;
+    private $forwardFactory;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Cache\FrontendInterface $attributeLabelCache
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory
-     * @param \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
+     * @param Context $context
+     * @param ForwardFactory $forwardFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Framework\Indexer\IndexerInterfaceFactory $indexerFactory,
-        \Magento\Backend\Model\View\Result\ForwardFactory $resultForwardFactory
+        Context $context,
+        ForwardFactory $forwardFactory
     ) {
-        $this->resultForwardFactory = $resultForwardFactory;
-        parent::__construct($context, $coreRegistry, $resultPageFactory, $indexerFactory);
+        $this->forwardFactory = $forwardFactory;
+        parent::__construct($context);
     }
 
     /**
-     * @return \Magento\Backend\Model\View\Result\Forward
+     * @return Forward
      */
     public function execute()
     {
-        return $this->resultForwardFactory->create()->forward('edit');
+        return $this->forwardFactory->create()->forward('edit');
     }
 }

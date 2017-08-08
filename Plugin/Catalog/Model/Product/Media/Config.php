@@ -21,6 +21,12 @@ class Config
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
 
+    /**
+     * @param MediaConfig $subject
+     * @param array $attributeCodes
+     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function afterGetMediaAttributeCodes(MediaConfig $subject, $attributeCodes)
     {
         return array_diff($attributeCodes, $this->categoryAttributeHelper->getCustomImageAttributesAsArray());

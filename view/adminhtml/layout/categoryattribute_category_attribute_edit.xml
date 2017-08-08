@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="left">
-            <block class="OuterEdge\CategoryAttribute\Block\Adminhtml\Category\Attribute\Edit\Tabs" name="attribute_edit_tabs">
+            <block class="Magento\Catalog\Block\Adminhtml\Product\Attribute\Edit\Tabs" name="attribute_edit_tabs">
                 <container label="Main" name="main">
                     <block class="OuterEdge\CategoryAttribute\Block\Adminhtml\Category\Attribute\Edit\Tab\Main" as="base"/>
                     <block class="Magento\Eav\Block\Adminhtml\Attribute\Edit\Options\Options" as="advanced"/>
