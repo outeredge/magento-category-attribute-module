@@ -6,6 +6,9 @@ use Magento\Store\Model\StoreManagerInterface;
 use OuterEdge\CategoryAttribute\Helper\Data as CategoryAttributeHelper;
 use Magento\Catalog\Model\Category\DataProvider as CategoryDataProvider;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\App\ObjectManager;
+use Magento\Catalog\Model\Category\FileInfo;
+use Magento\Framework\Filesystem;
 
 class DataProvider
 {
@@ -18,6 +21,11 @@ class DataProvider
      * @var CategoryAttributeHelper $categoryAttributeHelper
      */
     private $categoryAttributeHelper;
+    
+    /**
+     * @var Filesystem
+     */
+    private $fileInfo;
 
     /**
      * @param StoreManagerInterface $storeManager
@@ -30,7 +38,13 @@ class DataProvider
         $this->storeManager = $storeManager;
         $this->categoryAttributeHelper = $categoryAttributeHelper;
     }
-
+    
+    /**
+     * Set custom image attribute size & type
+     * 
+     * @param CategoryDataProvider $subject
+     * @param array $loadedData
+     */
     public function afterGetData(CategoryDataProvider $subject, array $loadedData)
     {
         if (empty($loadedData)) {
@@ -49,18 +63,30 @@ class DataProvider
         foreach ($loadedData as $categoryId => $categoryData) {
             foreach ($this->categoryAttributeHelper->getCustomImageAttributesAsArray() as $image) {
                 if (isset($categoryData[$image])) {
-                    $url = $this->storeManager->getStore()->getBaseUrl(
-                        UrlInterface::URL_TYPE_MEDIA
-                    ) . 'catalog/category/' . $categoryData[$image];
-
-                    $loadedData[$categoryId][$image] = [[
-                        'name' => $categoryData[$image],
-                        'url'  => $url
-                    ]];
+                    $fileName = $category->getData($image);
+                    if ($this->getFileInfo()->isExist($fileName)) {
+                        $stat = $this->getFileInfo()->getStat($fileName);
+                        $mime = $this->getFileInfo()->getMimeType($fileName);
+                        $loadedData[$categoryId][$image][0]['size'] = isset($stat) ? $stat['size'] : 0;
+                        $loadedData[$categoryId][$image][0]['type'] = $mime;
+                    }
                 }
             }
         }
 
         return $loadedData;
+    }
+    
+    /**
+     * Get FileInfo instance
+     *
+     * @return FileInfo
+     */
+    private function getFileInfo()
+    {
+        if ($this->fileInfo === null) {
+            $this->fileInfo = ObjectManager::getInstance()->get(FileInfo::class);
+        }
+        return $this->fileInfo;
     }
 }

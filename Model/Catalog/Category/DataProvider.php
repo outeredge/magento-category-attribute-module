@@ -76,7 +76,7 @@ class DataProvider extends CategoryDataProvider
     public function prepareMeta($meta)
     {
         $meta = parent::prepareMeta($meta);
-
+        
         foreach ($this->categoryAttributeHelper->getCustomAttributesAsArray() as $attribute) {
             if (isset($meta['attributes']['children'][$attribute]['arguments']['data']['config'])) {
                 $attributeConfig = &$meta['attributes']['children'][$attribute]['arguments']['data']['config'];
@@ -92,14 +92,14 @@ class DataProvider extends CategoryDataProvider
                             'dataType'       => 'image',
                             'formElement'    => 'fileUploader',
                             'uploaderConfig' => [
-                                'url' => 'categoryattribute/category_image/upload/attribute_code/' . $attribute
+                                'url' => 'catalog/category_image/upload'
                             ]
                         ]);
                     }
                 }
             }
         }
-
+        
         return $meta;
     }
 
