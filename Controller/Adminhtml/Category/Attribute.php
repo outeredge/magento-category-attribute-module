@@ -8,12 +8,12 @@ use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory;
 use Magento\Eav\Model\EntityFactory;
-use Magento\Framework\Indexer\IndexerInterfaceFactory;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Catalog\Model\Category;
 use Magento\Framework\Phrase;
 use Magento\Backend\Model\View\Result\Page;
+use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Catalog\Model\Indexer\Category\Flat\State;
 
 abstract class Attribute extends Action
@@ -41,26 +41,32 @@ abstract class Attribute extends Action
     protected $resultPageFactory;
 
     /**
-     * @var AttributeFactory $attributeFactory
+     * @var AttributeFactory
      */
     protected $attributeFactory;
 
     /**
-     * @var EntityFactory $entityFactory
+     * @var EntityFactory
      */
     protected $entityFactory;
 
     /**
-     * @var IndexerInterfaceFactory $indexerFactory
+     * @var IndexerRegistry
      */
-    protected $indexerFactory;
+    protected $indexerRegistry;
+    
+    /**
+     * @var State
+     */
+    protected $flatState;
 
     /**
      * @param Context $context
      * @param Registry $coreRegistry
      * @param PageFactory $resultPageFactory
      * @param EntityFactory $entityFactory
-     * @param IndexerInterfaceFactory $indexerFactory
+     * @param IndexerRegistry $indexerRegistry
+     * @param State $flatState
      */
     public function __construct(
         Context $context,
@@ -68,13 +74,15 @@ abstract class Attribute extends Action
         PageFactory $resultPageFactory,
         AttributeFactory $attributeFactory,
         EntityFactory $entityFactory,
-        IndexerInterfaceFactory $indexerFactory
+        IndexerRegistry $indexerRegistry,
+        State $flatState
     ) {
         $this->_coreRegistry = $coreRegistry;
         $this->resultPageFactory = $resultPageFactory;
         $this->attributeFactory = $attributeFactory;
         $this->entityFactory = $entityFactory;
-        $this->indexerFactory = $indexerFactory;
+        $this->indexerRegistry = $indexerRegistry;
+        $this->flatState = $flatState;
         parent::__construct($context);
     }
 
@@ -116,8 +124,11 @@ abstract class Attribute extends Action
      */
     protected function reindexCategoryFlatData()
     {
-        $this->indexerFactory->create()
-            ->load(State::INDEXER_ID)
-            ->reindexAll();
+        if ($this->flatState->isFlatEnabled()) {
+            $flatIndexer = $this->indexerRegistry->get(State::INDEXER_ID);
+            if (!$flatIndexer->isScheduled()) {
+                $flatIndexer->reindexAll();
+            }
+        }
     }
 }

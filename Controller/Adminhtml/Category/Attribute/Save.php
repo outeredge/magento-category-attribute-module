@@ -8,7 +8,8 @@ use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Catalog\Model\ResourceModel\Eav\AttributeFactory;
 use Magento\Eav\Model\EntityFactory;
-use Magento\Framework\Indexer\IndexerInterfaceFactory;
+use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Catalog\Model\Indexer\Category\Flat\State;
 use Magento\Catalog\Helper\Product as ProductHelper;
 use Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory;
 use Magento\Catalog\Model\Product\UrlFactory;
@@ -50,7 +51,8 @@ class Save extends Attribute
      * @param PageFactory $resultPageFactory
      * @param AttributeFactory $attributeFactory
      * @param EntityFactory $entityFactory
-     * @param IndexerInterfaceFactory $indexerFactory
+     * @param IndexerRegistry $indexerRegistry
+     * @param State $flatState
      * @param ProductHelper $productHelper
      * @param ValidatorFactory $validatorFactory
      * @param UrlFactory $urlFactory
@@ -62,7 +64,8 @@ class Save extends Attribute
         PageFactory $resultPageFactory,
         AttributeFactory $attributeFactory,
         EntityFactory $entityFactory,
-        IndexerInterfaceFactory $indexerFactory,
+        IndexerRegistry $indexerRegistry,
+        State $flatState,
         ProductHelper $productHelper,
         ValidatorFactory $validatorFactory,
         UrlFactory $urlFactory,
@@ -78,7 +81,8 @@ class Save extends Attribute
             $resultPageFactory,
             $attributeFactory,
             $entityFactory,
-            $indexerFactory
+            $indexerRegistry,
+            $flatState
         );
     }
 
