@@ -11,7 +11,6 @@ class Advanced extends AttributeTabAdvanced
      */
     private $fieldsToRemove = [
         'default_value_text',
-        'default_value_yesno',
         'default_value_date',
         'default_value_textarea',
         'is_unique',

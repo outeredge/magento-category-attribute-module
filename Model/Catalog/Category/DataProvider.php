@@ -85,7 +85,7 @@ class DataProvider extends CategoryDataProvider
                         $attributeConfig = array_merge($attributeConfig, [
                             'dataType'    => 'select',
                             'formElement' => 'select',
-                            'default'     => 0
+                            'default'     => '0'
                         ]);
                     } elseif ($attributeConfig['dataType'] === 'media_image') {
                         $attributeConfig = array_merge($attributeConfig, [
