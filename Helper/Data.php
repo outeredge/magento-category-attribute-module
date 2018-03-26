@@ -90,7 +90,7 @@ class Data extends AbstractHelper
      */
     public function getCustomImageAttributesAsArray()
     {
-        if (!$this->customImageAttributesArray) {
+        if (!is_null($this->customImageAttributesArray)) {
             $this->customImageAttributesArray = [];
             foreach ($this->getCustomImageAttributes() as $attribute) {
                 $this->customImageAttributesArray[] = $attribute->getAttributeCode();
